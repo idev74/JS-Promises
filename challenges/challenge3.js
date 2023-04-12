@@ -7,13 +7,18 @@
  *    Async/Await. How is this function different than a regular (non-async)
  *    function? What is its return type?
  * 
+ * This function is different because it waits for a resolved action to be complete
+ * before it runs the rest of the function. Its return type is a promise.
  * 
  * 2. Uncomment block #1 and run the code using `node challenge3.js`. What is
  *    printed when we use `greetAndUppercase` like a regular function?
  * 
+ * It prints "Promise { <pending> }," this is ecause the previous action
+ * was not fulfilled before the next action was called.
  * 
  * 3. Uncomment block #2 and run the code again. What happens now?
  * 
+ * It still prints "Promise { <pending> }," but it also prints "HELLO THERE, DUCKY."
  * 
  * 4. Write an asynchronous method 'spacer' that takes a string as input and 
  *    returns the input string with a space added between each character. You 
@@ -29,20 +34,20 @@
  */
 
 
- /**
-  * Asynchronously returns a greeting for a specified name.
-  * @param name The name of the person to greet.
-  */
- function greet(name) {
-    return new Promise(function(resolve, reject) {
-      setTimeout(function() {
-        if (typeof name === 'string') { 
-          resolve('Hello there, ' + name);
-        } else {
-          reject('Name must be a string!');
-        }
-      }, 500);
-    });
+/**
+ * Asynchronously returns a greeting for a specified name.
+ * @param name The name of the person to greet.
+ */
+function greet(name) {
+  return new Promise(function (resolve, reject) {
+    setTimeout(function () {
+      if (typeof name === 'string') {
+        resolve('Hello there, ' + name);
+      } else {
+        reject('Name must be a string!');
+      }
+    }, 500);
+  });
 }
 
 /**
@@ -50,32 +55,45 @@
  * @param {*} str The string to uppercase.
  */
 function uppercaser(str) {
-    return new Promise(function(resolve, reject) {
-        setTimeout(function() {
-        if (typeof str === 'string') {
-            resolve(str.toUpperCase());
-        } else {
-            reject('Argument to uppercaser must be string');
-        }
-        }, 500);
-    });
+  return new Promise(function (resolve, reject) {
+    setTimeout(function () {
+      if (typeof str === 'string') {
+        resolve(str.toUpperCase());
+      } else {
+        reject('Argument to uppercaser must be string');
+      }
+    }, 500);
+  });
+}
+
+function spacer(str) {
+  return new Promise(function(resolve, reject) {
+    setTimeout(function() {
+      if (typeof str === 'string') {
+        resolve(str.split('').join(' '));
+      } else {
+        reject('Argument to spacer must be string')
+      }
+    }, 1000);
+  });
 }
 
 async function greetAndUppercase(name) {
-    greeting = await greet(name)
-    uppercasedGreeting = await uppercaser(greeting)
-    return uppercasedGreeting
+  greeting = await greet(name);
+  uppercasedGreeting = await uppercaser(greeting);
+  spacedGreeting = await spacer(uppercasedGreeting);
+  return spacedGreeting;
 }
 
 /* Uncomment me! #1 */
-// result = greetAndUppercase('Ducky')
-// console.log(result)
+result = greetAndUppercase('Ducky')
+console.log(result)
 
 /* Uncomment me! #2 */
-// greetAndUppercase('Ducky')
-//     .then(function(result) {
-//         console.log(result)
-//     })
-//     .catch(function(err) {
-//         console.log(err)
-//     })
+greetAndUppercase('Ducky')
+  .then(function (result) {
+    console.log(result)
+  })
+  .catch(function (err) {
+    console.log(err)
+  })
